@@ -24,8 +24,6 @@ fi
 
 ##############################
 
-
-
 # Check to see if setup has already run
 if [ ! -f ./already_configured ]; then 
   # make sure it only executes once
@@ -43,7 +41,6 @@ else
   echo "Build environment is configured. Continuing with build"
   echo ""
 fi
-
 
 #########################
 
@@ -90,29 +87,6 @@ echo $DIR > $BINDIR/builds/build-$DIR/md5sums-$VER
 
 function build_mp01() {
 
-echo "Set up .config for "$1 $2
-rm ./.config
-
-if [ $2 ]; then
-	echo "Config file: config-"$1-$2
-	cp ./SECN-build/$1/config-$1-$2  ./.config
-else
-	echo "Config file: config-"$1
-	cp ./SECN-build/$1/config-$1  ./.config
-fi
-
-echo "Run defconfig"
-make defconfig > /dev/null
-
-# Set up target display strings
-TARGET=MP01
-OPENWRTVER=`cat ./.config | grep "OpenWrt version" | cut -d : -f 2`
-
-echo "Check .config version"
-echo "Target:  " $TARGET
-echo "OpenWRT: " $OPENWRTVER
-echo ""
-
 echo "Set up files for "$1 $2
 echo "Remove files directory"
 rm -r ./files
@@ -140,11 +114,35 @@ echo "Check files directory"
 ls -al ./files  
 echo ""
 
+echo "Set up .config for "$1 $2
+rm ./.config
+
+if [ $2 ]; then
+	echo "Config file: config-"$1-$2
+	cp ./SECN-build/$1/config-$1-$2  ./.config
+else
+	echo "Config file: config-"$1
+	cp ./SECN-build/$1/config-$1  ./.config
+fi
+
+echo "Run defconfig"
+make defconfig > /dev/null
+echo ""
+
+# Set up target display strings
+TARGET=MP01
+OPENWRTVER=`cat ./.config | grep "OpenWrt version" | cut -d : -f 2`
+
+echo "Check .config version"
+echo "Target:  " $TARGET
+echo "OpenWRT: " $OPENWRTVER
+echo ""
+
 echo "Version: " $VER $TARGET $2
 echo "Date stamp: " $DATE
 
 echo "Version:    " $VER $TARGET $2       > ./files/etc/secn_version
-echo "OpenWRT:    " $OPENWRTVER           >> ./files/etc/secn_version
+#echo "OpenWRT:    " $OPENWRTVER           >> ./files/etc/secn_version
 echo "Build date: " $DATE                 >> ./files/etc/secn_version
 echo "GitHub:     " $REPO $REPOID         >> ./files/etc/secn_version
 echo " "                                  >> ./files/etc/secn_version
